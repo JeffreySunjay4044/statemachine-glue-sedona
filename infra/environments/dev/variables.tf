@@ -34,6 +34,18 @@ variable "job_entry_point" {
   default     = "nexteraa_glue_jobs.sedona_logic_job:SedonaLogicJob"
 }
 
+variable "states_wkt_s3_path" {
+  description = "The S3 path of the CSV file."
+  type        = string
+  default     = "s3://glue-sedona/data/customers_database/country_csv/boundary-each-state.tsv"
+}
+
+variable "cities_wkt_s3_path" {
+  description = "The S3 path of the CSV file."
+  type        = string
+  default     = "s3://glue-sedona/data/customers_database/country_csv/cities.csv"
+}
+
 variable "glue_crawler_prefix" {
   description = "The prefix of the Glue crawler."
   type        = string

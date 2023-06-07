@@ -99,6 +99,16 @@ variable "job_entry_point" {
   type        = string
 }
 
+variable "states_wkt_s3_path" {
+  description = "The S3 path of the CSV file."
+  type        = string
+}
+
+variable "cities_wkt_s3_path" {
+  description = "The S3 path of the CSV file."
+  type        = string
+}
+
 variable "processed_glue_database_name" {
   default     = null
   description = "The name of the Glue database that contains tables for processed data.  Must be defined if 'enable_destination_crawler' is true."

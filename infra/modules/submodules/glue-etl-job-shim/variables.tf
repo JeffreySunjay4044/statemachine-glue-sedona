@@ -74,6 +74,16 @@ variable "job_entry_point" {
   type        = string
 }
 
+variable "states_wkt_s3_path" {
+  description = "The S3 path of the CSV file."
+  type        = string
+}
+
+variable "cities_wkt_s3_path" {
+  description = "The S3 path of the CSV file."
+  type        = string
+}
+
 variable "max_concurrent_runs" {
   default     = 1
   description = "The maximum number of concurrent runs allowed for a job. Defaults to 1."

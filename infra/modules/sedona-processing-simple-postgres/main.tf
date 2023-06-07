@@ -67,6 +67,8 @@ module "glue_job" {
   timeout                   = var.glue_job_timeout
   worker_type               = var.glue_job_worker_type
   job_entry_point           = var.job_entry_point
+  cities_wkt_s3_path        = var.cities_wkt_s3_path
+  states_wkt_s3_path        = var.states_wkt_s3_path
 }
 
 # ---------------------------------------------------------------------------------------------------------------------

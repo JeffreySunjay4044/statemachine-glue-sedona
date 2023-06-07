@@ -30,9 +30,11 @@ module "sedona-processing-s3" {
   tags = var.tags
   temp_bucket = var.temp_bucket
   job_entry_point = var.job_entry_point
+  cities_wkt_s3_path = var.cities_wkt_s3_path
+  states_wkt_s3_path = var.states_wkt_s3_path
 }
 
-module "sedona-processing-s3" {
+module "sedona-processing-simple-s3" {
   source = "../../modules/sedona-processing-simple-s3"
   application = var.application
   aws_account_id = var.aws_account_id
@@ -46,4 +48,6 @@ module "sedona-processing-s3" {
   tags = var.tags
   temp_bucket = var.temp_bucket
   job_entry_point = "Sedonalogicjob2.py"
+  cities_wkt_s3_path = var.cities_wkt_s3_path
+  states_wkt_s3_path = var.states_wkt_s3_path
 }

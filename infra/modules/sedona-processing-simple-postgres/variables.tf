@@ -18,6 +18,16 @@ variable "aws_region" {
   type        = string
 }
 
+variable "states_wkt_s3_path" {
+  description = "The S3 path of the CSV file."
+  type        = string
+}
+
+variable "cities_wkt_s3_path" {
+  description = "The S3 path of the CSV file."
+  type        = string
+}
+
 variable "data_lake_bucket" {
   description = "The name of the data lake S3 bucket."
   type        = string

@@ -15,6 +15,8 @@ locals {
     "--job-bookmark-option"              = var.enable_bookmarking ? "job-bookmark-enable" : "job-bookmark-disable"
     "--job-language"                     = "python"
     "--job_entry_point"                  = var.job_entry_point
+    "--STATES_WKT_S3_PATH"               = var.states_wkt_s3_path
+    "--CITIES_CSV_S3_PATH"               = var.cities_wkt_s3_path
   }
 
   glue_arg_additional_modules = length(var.additional_python_modules) == 0 ? {} : {
