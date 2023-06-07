@@ -34,6 +34,12 @@ variable "job_entry_point" {
   default     = "nexteraa_glue_jobs.sedona_logic_job:SedonaLogicJob"
 }
 
+variable "sedona_agg_job_entry_point" {
+  description = "The Python module and class name of the job entry point, provided in the form 'module:Class' (e.g., 'allied_glue_jobs.catalog_to_s3_job:CatalogToS3Job')."
+  type        = string
+  default     = "nexteraa_glue_jobs.sedona_logic_job:SedonaLogicJob2"
+}
+
 variable "states_wkt_s3_path" {
   description = "The S3 path of the CSV file."
   type        = string
@@ -55,7 +61,7 @@ variable "glue_crawler_prefix" {
 variable "glue_job_python_modules" {
   description = "A list of Python modules to include in the optimization Glue Job."
   type        = list(string)
-  default     = []
+  default     = ["nnexteraa-glue 0.1.dev0"]
 }
 
 variable "glue_network_connection_name" {

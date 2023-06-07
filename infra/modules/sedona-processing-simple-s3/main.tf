@@ -67,8 +67,6 @@ module "glue_job" {
   timeout                   = var.glue_job_timeout
   worker_type               = var.glue_job_worker_type
   job_entry_point           = var.job_entry_point
-  cities_wkt_s3_path        = var.cities_wkt_s3_path
-  states_wkt_s3_path        = var.states_wkt_s3_path
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -131,8 +129,15 @@ resource "aws_iam_role" "glue_role" {
 # State Machine
 # ---------------------------------------------------------------------------------------------------------------------
 
+
+variable "cities_csv_path" {
+  default = ""
+}
+variable "states_wkt_path" {
+  default = ""
+}
 module "state_machine" {
-  source = "../submodules/state-machines/run-crawler"
+  source = "../submodules/state-machines/run-sedona-job"
 
   application                   = var.application
   aws_account_id                = var.aws_account_id
@@ -141,4 +146,7 @@ module "state_machine" {
   name                          = var.phase_name
   tags                          = local.tags
   glue_crawler_prefix = var.glue_crawler_prefix
+  glue_job_name                 = module.glue_job.glue_job_name
+  states_wkt_path               = var.states_wkt_path
+  cities_csv_path =  var.cities_csv_path
 }

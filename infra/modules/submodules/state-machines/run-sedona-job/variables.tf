@@ -18,21 +18,6 @@ variable "aws_region" {
   type        = string
 }
 
-variable "destination_glue_crawler_name" {
-  default     = null
-  description = "The name of the destination Glue Crawler. Must be set if 'run_destination_crawler' is true."
-  type        = string
-}
-
-variable "destination_s3_uri_prefix" {
-  description = "The S3 URI prefix used for the output of the Glue Job. Must be of the form 's3://<bucket-name>/<path>'."
-  type        = string
-}
-
-variable "get_tables_lambda_arn" {
-  description = "The ARN of the 'GetTables' Lambda Function."
-  type        = string
-}
 
 variable "glue_job_name" {
   description = "The name of the Glue Job which will be executed via the State Machine."
@@ -73,35 +58,6 @@ variable "retention_in_days" {
   default     = 30
   description = "The number of days to retain state machine log messages."
   type        = number
-}
-
-variable "run_crawler_state_machine_arn" {
-  default     = null
-  description = "The ARN of the 'RunCrawler' State Machine. Must be set if 'run_source_crawler' or 'run_destination_crawler' is true."
-  type        = string
-}
-
-variable "run_destination_crawler" {
-  default     = false
-  description = "Whether or not to run the destination Glue Crawler. If set to true, 'run_crawler_state_machine_arn' and 'destination_glue_crawler_name' must also be provided."
-  type        = bool
-}
-
-variable "run_source_crawler" {
-  default     = false
-  description = "Whether or not to run the source Glue Crawler. If set to true, 'run_crawler_state_machine_arn' and 'source_glue_crawler_name' must also be provided."
-  type        = bool
-}
-
-variable "source_glue_crawler_name" {
-  default     = null
-  description = "The name of the source Glue Crawler. Must be set if 'run_source_crawler' is true."
-  type        = string
-}
-
-variable "source_glue_database_name" {
-  description = "The name of the source Glue Database."
-  type        = string
 }
 
 variable "tags" {

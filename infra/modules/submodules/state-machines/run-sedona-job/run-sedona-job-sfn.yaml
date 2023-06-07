@@ -1,0 +1,16 @@
+StartAt: RunJob
+
+States:
+
+  RunJob:
+    Type: Task
+    Resource: arn:aws:states:::glue:startJobRun
+    Parameters:
+      JobName.$: ${glue_job_name}
+      Arguments.$:
+        "--states_wkt_path": ${cities_csv_path}
+        "--cities_csv_path": ${states_wkt_path}
+    Next: Finish
+
+  Finish:
+    Type: Succeed
