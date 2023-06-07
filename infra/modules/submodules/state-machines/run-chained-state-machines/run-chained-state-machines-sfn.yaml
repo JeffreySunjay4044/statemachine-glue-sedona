@@ -1,0 +1,32 @@
+StartAt: AddStartedBy0
+
+States:
+
+%{~ for index, state_machine_arn in state_machine_arns ~}
+  AddStartedBy${index}:
+    Type: Pass
+    InputPath: $$.Execution.Id
+    ResultPath: $.AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID
+    Next: PrepareStateMachineInputJson${index}
+
+  PrepareStateMachineInputJson${index}:
+    Type: Pass
+    Parameters:
+      NextInput.$: $
+      NextStateMachineArn: ${state_machine_arn}
+    Next: RunStateMachine${index}
+
+  RunStateMachine${index}:
+    Type: Task
+    Resource: arn:aws:states:::states:startExecution.sync:2
+    Parameters:
+      StateMachineArn.$: $.NextStateMachineArn
+      Input.$: $.NextInput
+    OutputPath: $.Output
+    %{~ if index < length(state_machine_arns) - 1 ~}
+    Next: AddStartedBy${index + 1}
+    %{~ else ~}
+    End: true
+    %{~ endif ~}
+
+%{~ endfor ~}

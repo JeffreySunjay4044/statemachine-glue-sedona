@@ -1,0 +1,46 @@
+StartAt: StartCrawler
+
+States:
+
+  StartCrawler:
+    Type: Task
+    Resource: arn:aws:states:::aws-sdk:glue:startCrawler
+    Parameters:
+      Name.$: $.CrawlerName
+    ResultPath: null
+    Next: WaitForCrawler
+
+  WaitForCrawler:
+    Type: Wait
+    Seconds: 10
+    Next: GetCrawlerState
+
+  GetCrawlerState:
+    Type: Task
+    Resource: arn:aws:states:::aws-sdk:glue:getCrawler
+    Parameters:
+      Name.$: $.CrawlerName
+    ResultSelector:
+      State.$: $.Crawler.State
+    ResultPath: $.GetCrawler
+    Next: ProceedIfCrawlerComplete
+
+  ProceedIfCrawlerComplete:
+    Type: Choice
+    Choices:
+      - Variable: $.GetCrawler.State
+        StringEquals: RUNNING
+        Next: WaitForCrawler
+      - Variable: $.GetCrawler.State
+        StringEquals: STOPPING
+        Next: WaitForCrawler
+      - Variable: $.GetCrawler.State
+        StringEquals: READY
+        Next: CrawlerFinished
+    Default: FailOnUnexpectedCrawlerState
+
+  FailOnUnexpectedCrawlerState:
+    Type: Fail
+
+  CrawlerFinished:
+    Type: Succeed

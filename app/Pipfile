@@ -1,0 +1,32 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[requires]
+python_version = "3.7"
+
+[dev-packages]
+# Per AWS, the 'master' branch of 'aws-glue-libs' tracks Glue 3.0
+aws-glue-libs = { git = "https://github.com/awslabs/aws-glue-libs.git", ref = "master" }
+data-platform-devtools = { editable = true, git = "ssh://git@github.com/alliedworld/data_platform_devtools.git", ref = "main" }
+boto3 = ">=1.16.47"
+pipenv-setup = ">=3.1.1"
+pycodestyle = "==2.7.0"
+pyspark = "==3.1.1"
+pytest = "==6.2.2"
+pytest-datadir = "*"
+setuptools_scm = ">=6.0.1"
+twine = "==3.4.1"
+chardet = "*"
+pyarrow = "==2.0.0"
+moto = "*"
+
+[packages]
+awswrangler = "==2.15.1"
+moto = "*"
+datetime = "*"
+
+[scripts]
+setup = "python -m data_platform_devtools.cli.local_glue_setup"
+test = "bin/glue-pytest.sh -v tests/"

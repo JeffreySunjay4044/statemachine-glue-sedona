@@ -1,0 +1,106 @@
+StartAt: SetupFlags
+
+States:
+
+  SetupFlags:
+    Type: Pass
+    Result:
+      ShouldRunSourceCrawler: ${should_run_source_crawler}
+      ShouldRunDestinationCrawler: ${should_run_destination_crawler}
+    ResultPath: $.Flags
+    Next: SourceCrawlerGate
+
+  SourceCrawlerGate:
+    Type: Choice
+    Choices:
+      - Variable: $.Flags.ShouldRunSourceCrawler
+        BooleanEquals: true
+        Next: RunSourceCrawler
+    Default: GetTables
+
+  RunSourceCrawler:
+    Type: Task
+    Resource: arn:aws:states:::states:startExecution.sync:2
+    Parameters:
+      StateMachineArn: ${run_crawler_state_machine_arn}
+      Input:
+        CrawlerName: ${source_glue_crawler_name}
+        AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$: $$.Execution.Id
+    ResultPath: null
+    Next: GetTablesFromCrawler
+
+  GetTablesFromCrawler:
+    Type: Task
+    Resource: ${get_tables_lambda_arn}
+    Parameters:
+      DatabaseName: ${source_glue_database_name}
+      CrawlerName: ${source_glue_crawler_name}
+    ResultSelector:
+      SourceTables.$: $.tables
+    ResultPath: $.Variables
+    Next: RunJobs
+
+  GetTables:
+    Type: Task
+    Resource: ${get_tables_lambda_arn}
+    Parameters:
+      DatabaseName: ${source_glue_database_name}
+    ResultSelector:
+      SourceTables.$: $.tables
+    ResultPath: $.Variables
+    Next: RunJobs
+
+  RunJobs:
+    Type: Map
+    ItemsPath: $.Variables.SourceTables
+    MaxConcurrency: ${max_task_concurrency}
+    Parameters:
+      SourceTable.$: $$.Map.Item.Value
+    Iterator:
+      StartAt: RunJob
+      States:
+        RunJob:
+          Type: Task
+          Resource: arn:aws:states:::glue:startJobRun.sync
+          Parameters:
+            JobName: ${glue_job_name}
+            Arguments:
+              "--destination_path.$": "States.Format('${destination_path_prefix}/{}', $.SourceTable)"
+              "--run_date_iso_8601.$": $$.Execution.StartTime
+              "--source_database": ${source_glue_database_name}
+              "--source_table.$": $.SourceTable
+          Retry:
+            - ErrorEquals: [ "States.TaskFailed", "Glue.ConcurrentRunsExceededException" ]
+              # Wait before retrying to prevent "Glue.ConcurrentRunsExceededException" due to eventual consistency in job tracking
+              IntervalSeconds: ${glue_job_retry_interval_seconds}
+              MaxAttempts: 5
+          Next: Waiter
+        # Wait between job runs to prevent "Glue.ConcurrentRunsExceededException" due to eventual consistency in job tracking
+        Waiter:
+          Type: Wait
+          Seconds: ${glue_job_run_waiter_seconds}
+          End: true
+    ResultPath: null
+    Next: DestinationCrawlerGate
+
+  DestinationCrawlerGate:
+    Type: Choice
+    Choices:
+      - Variable: $.Flags.ShouldRunDestinationCrawler
+        BooleanEquals: true
+        Next: RunDestinationCrawler
+    Default: Finish
+
+  RunDestinationCrawler:
+    Type: Task
+    Resource: arn:aws:states:::states:startExecution.sync:2
+    Parameters:
+      StateMachineArn: ${run_crawler_state_machine_arn}
+      Input:
+        CrawlerName: ${destination_glue_crawler_name}
+        AWS_STEP_FUNCTIONS_STARTED_BY_EXECUTION_ID.$: $$.Execution.Id
+    ResultPath: null
+    Next: Finish
+
+  Finish:
+    Type: Succeed
